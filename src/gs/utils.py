@@ -1,4 +1,5 @@
 import torch
+import math
 
 
 def inverse_sigmoid(x):
@@ -55,3 +56,17 @@ def build_scaling_rotation(s, r):
 
     L = R @ L
     return L
+
+
+def fov2focal(fov, pixels):
+    return pixels / (2 * math.tan(fov / 2))
+
+
+def focal2fov(focal, pixels):
+    return 2 * math.atan(pixels / (2 * focal))
+
+
+class BasicPointCloud(NamedTuple):
+    points: np.array
+    colors: np.array
+    normals: np.array

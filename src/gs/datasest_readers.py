@@ -1,5 +1,13 @@
 import cv2 as cv
 import numpy as np
+from typing import NamedTuple, Optional
+import os
+import json
+from .utils import focal2fov, BasicPointCloud
+from PIL import Image
+from scipy.spatial.transform import Slerp, Rotation
+
+
 class CameraInfo(NamedTuple):
     uid: int
     R: np.array
@@ -14,6 +22,16 @@ class CameraInfo(NamedTuple):
     fid: float
     exp: np.array
     depth: Optional[np.array] = None
+
+
+class SceneInfo(NamedTuple):
+    point_cloud: BasicPointCloud
+    train_cameras: list
+    test_cameras: list
+    nerf_normalization: dict
+    ply_path: str
+
+
 def readNerfBlendShapeCameras(path, is_eval, is_debug, novel_view, only_head):
     with open(os.path.join(path, "transforms.json"), 'r') as f:
         meta_json = json.load(f)
@@ -83,6 +101,7 @@ def readNerfBlendShapeCameras(path, is_eval, is_debug, novel_view, only_head):
                                     fid=image_id))
     '''finish load all data'''
     return cam_infos
+
 def readNeRFBlendShapeDataset(path, eval, is_debug, novel_view, only_head):
     print("Load NeRFBlendShape Train Dataset")
     train_cam_infos = readNerfBlendShapeCameras(path=path, is_eval=False, is_debug=is_debug, novel_view=novel_view,
